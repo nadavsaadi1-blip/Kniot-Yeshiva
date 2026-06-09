@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רשימת קניות</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f8f9fa;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ====== SIDEBAR ====== */
+  #sidebar {
+    width: 320px;
+    min-width: 320px;
+    background: #fff;
+    border-left: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+  }
+
+  #sidebar h2 {
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+  }
+
+  .sidebar-section { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+  .sidebar-section label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; }
+  .sidebar-section input, .sidebar-section select, .sidebar-section textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px;
+    font-size: 14px; font-family: inherit; margin-bottom: 8px; direction: rtl;
+  }
+  .sidebar-section textarea { resize: vertical; min-height: 60px; }
+
+  .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit; transition: opacity .15s; }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: #3b6de4; color: #fff; width: 100%; margin-bottom: 6px; }
+  .btn-danger { background: #e44b4b; color: #fff; }
+  .btn-secondary { background: #f0f0f0; color: #444; }
+
+  #product-list-sidebar { padding: 0 20px 20px; }
+  .sidebar-product-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; border-radius: 6px; margin-bottom: 4px;
+    background: #f8f9fa; font-size: 13px; cursor: pointer;
+    border: 1px solid transparent; transition: border-color .15s;
+  }
+  .sidebar-product-item:hover { border-color: #3b6de4; }
+  .sidebar-product-item .item-actions { display: flex; gap: 4px; }
+  .sidebar-product-item .edit-btn, .sidebar-product-item .del-btn {
+    background: none; border: none; cursor: pointer; font-size: 15px; padding: 2px 4px;
+  }
+
+  /* ====== MAIN ====== */
+  #main {
+    flex: 1;
+    padding: 24px 32px;
+    overflow-y: auto;
+  }
+
+  #main h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  #main .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+  /* ====== SHABBAT ITEM ====== */
+  .shabbat-card {
+    background: linear-gradient(135deg, #fff8e1, #fff3c4);
+    border: 2px solid #f5c518;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .shabbat-card .shabbat-title {
+    font-size: 15px; font-weight: 700; color: #7a5c00; display: flex; align-items: center; gap: 8px;
+  }
+  .shabbat-card .shabbat-title span.icon { font-size: 22px; }
+  .shabbat-card .shabbat-count { font-size: 12px; color: #a07800; margin-top: 2px; }
+  .shabbat-add-btn {
+    padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 600; font-family: inherit;
+    transition: all .2s;
+  }
+  .shabbat-add-btn.active {
+    background: #f5c518; color: #3a2d00;
+  }
+  .shabbat-add-btn.inactive {
+    background: #eee; color: #666;
+  }
+
+  /* ====== CATEGORY ====== */
+  .category-block { margin-bottom: 28px; }
+  .category-title {
+    font-size: 13px; font-weight: 600; letter-spacing: .5px;
+    padding: 4px 10px; border-radius: 20px; display: inline-block;
+    margin-bottom: 10px; color: #444;
+  }
+
+  /* ====== PRODUCT ROW ====== */
+  .product-row {
+    display: flex; align-items: center;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 4px;
+    border: 1.5px solid transparent; transition: border-color .15s, opacity .15s;
+  }
+  .product-row.added { opacity: .55; }
+  .product-row.added .product-name { text-decoration: line-through; }
+
+  .product-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .product-note { font-size: 11px; color: #888; margin-top: 1px; }
+  .product-qty-default { font-size: 12px; color: #aaa; margin-left: 8px; margin-right: 8px; }
+
+  .row-actions { display: flex; align-items: center; gap: 6px; }
+  .qty-btn {
+    width: 30px; height: 30px; border-radius: 6px; border: 1px solid #ddd;
+    background: #fff; cursor: pointer; font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s; color: #444;
+  }
+  .qty-btn:hover { background: #f0f0f0; }
+  .qty-btn.minus:hover { background: #ffeaea; color: #c00; border-color: #e9a0a0; }
+  .qty-btn.plus:hover { background: #eafff2; color: #007a00; border-color: #8ddba0; }
+
+  .add-btn-main {
+    padding: 7px 18px; border-radius: 7px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    background: #3b6de4; color: #fff; transition: background .15s;
+    min-width: 70px;
+  }
+  .add-btn-main:hover { background: #2a56c6; }
+  .add-btn-main.added-state { background: #e44b4b; }
+  .add-btn-main.added-state:hover { background: #c03030; }
+
+  .qty-indicator {
+    font-size: 12px; color: #3b6de4; font-weight: 700;
+    min-width: 30px; text-align: center;
+  }
+
+  /* ====== SUMMARY BTN ====== */
+  #finish-btn {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #1a8c2e; color: #fff; border: none; border-radius: 24px;
+    padding: 14px 36px; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer; box-shadow: 0 4px 18px rgba(26,140,46,.3);
+    transition: background .2s; z-index: 100; display: flex; align-items: center; gap: 8px;
+  }
+  #finish-btn:hover { background: #157025; }
+  #finish-count { background: rgba(255,255,255,.25); border-radius: 12px; padding: 1px 8px; font-size: 13px; }
+
+  /* ====== MODAL ====== */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999; direction: rtl;
+  }
+  .modal-box {
+    background: #fff; border-radius: 14px; padding: 28px 32px;
+    max-width: 480px; width: 90%; max-height: 80vh; overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,.18);
+  }
+  .modal-box h3 { font-size: 18px; margin-bottom: 16px; }
+  .modal-list { background: #f8f9fa; border-radius: 8px; padding: 14px 16px; font-size: 14px; line-height: 2; white-space: pre-wrap; direction: rtl; font-family: monospace; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }
+
+  /* ====== CONFIG PANEL ====== */
+  #config-panel {
+    background: #fffde7; border: 1px solid #ffe082; border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 20px; font-size: 13px;
+  }
+  #config-panel input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; margin-top: 4px; font-family: inherit; direction: ltr; }
+  #config-panel .config-row { display: flex; gap: 8px; align-items: flex-end; margin-top: 8px; }
+  #config-panel .config-row input { flex: 1; }
+
+  /* ====== CATEGORY COLORS ====== */
+  :root {
+    --cat-color-0: #e3f0ff;
+    --cat-color-1: #e8f8e8;
+    --cat-color-2: #fff3e0;
+    --cat-color-3: #fce4ec;
+    --cat-color-4: #ede7f6;
+    --cat-color-5: #e0f7fa;
+    --cat-color-6: #f9fbe7;
+    --cat-color-7: #fff8e1;
+    --cat-color-8: #fce4ec;
+    --cat-color-badge-0: #3b6de4;
+    --cat-color-badge-1: #2e7d32;
+    --cat-color-badge-2: #e65100;
+    --cat-color-badge-3: #c2185b;
+    --cat-color-badge-4: #6a1b9a;
+    --cat-color-badge-5: #00838f;
+    --cat-color-badge-6: #558b2f;
+    --cat-color-badge-7: #f57f17;
+    --cat-color-badge-8: #880e4f;
+  }
+
+  .empty-state { text-align: center; color: #bbb; font-size: 14px; padding: 40px 0; }
+  .loading { text-align: center; color: #888; font-size: 14px; padding: 40px 0; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ====== SIDEBAR ====== -->
+<div id="sidebar">
+  <h2>⚙️ ניהול מוצרים</h2>
+
+  <!-- Sheets Config -->
+  <div class="sidebar-section" id="sheets-config-section">
+    <label>🔗 קישור Google Sheets (רשימה ראשית)</label>
+    <input type="text" id="sheets-url" placeholder="הדבק כאן את כתובת ה-Sheets" />
+    <label>🔗 קישור Google Sheets (קניות שבת)</label>
+    <input type="text" id="sheets-shabbat-url" placeholder="Sheets של שבת" />
+    <button class="btn btn-primary" onclick="loadFromSheets()">📥 טען מ-Google Sheets</button>
+    <div id="sheets-status" style="font-size:12px; color:#888; margin-top:4px;"></div>
+    <div style="font-size:11px; color:#aaa; margin-top:6px; line-height:1.6;">
+      פתח את ה-Sheets ← קובץ ← שתף ← "כולם עם הקישור" ← העתק קישור.
+    </div>
+  </div>
+
+  <!-- Add/Edit Product -->
+  <div class="sidebar-section">
+    <div style="font-weight:600; margin-bottom:10px; font-size:14px;" id="form-title">➕ הוסף מוצר</div>
+    <label>שם מוצר</label>
+    <input type="text" id="f-name" placeholder="שם המוצר" />
+    <label>קטגוריה</label>
+    <input type="text" id="f-cat" placeholder="ירקות, פירות, חלב..." list="cat-list" />
+    <datalist id="cat-list"></datalist>
+    <label>כמות ברירת מחדל</label>
+    <input type="number" id="f-qty" placeholder="10" min="0" />
+    <label>יחידה (אופציונלי)</label>
+    <input type="text" id="f-unit" placeholder="גרם, יח', ק&quot;ג..." />
+    <label>הערה (אופציונלי)</label>
+    <textarea id="f-note" placeholder="קטנים וקשים, אדומים..."></textarea>
+    <label>שייך לשבת?</label>
+    <select id="f-shabbat">
+      <option value="no">לא</option>
+      <option value="yes">כן</option>
+    </select>
+    <button class="btn btn-primary" onclick="saveProduct()">💾 שמור</button>
+    <button class="btn btn-secondary" style="width:100%" onclick="cancelEdit()">ביטול</button>
+    <div id="form-msg" style="font-size:12px; color:#e44; margin-top:4px;"></div>
+  </div>
+
+  <!-- Product list in sidebar -->
+  <div id="product-list-sidebar">
+    <div style="font-size:12px; color:#999; margin-bottom:8px;" id="sidebar-count"></div>
+    <div id="sidebar-items"></div>
+  </div>
+</div>
+
+<!-- ====== MAIN ====== -->
+<div id="main">
+  <h1>🛒 רשימת קניות</h1>
+  <p class="subtitle" id="main-subtitle">בחר מוצרים לרשימת הקנייה השבועית</p>
+
+  <!-- Shabbat card -->
+  <div class="shabbat-card" id="shabbat-card">
+    <div>
+      <div class="shabbat-title"><span class="icon">✡️</span> קניות שבת</div>
+      <div class="shabbat-count" id="shabbat-count-label">לחץ להוסיף את כל פריטי השבת לרשימה</div>
+    </div>
+    <button class="shabbat-add-btn inactive" id="shabbat-toggle-btn" onclick="toggleShabbat()">הוסף לרשימה</button>
+  </div>
+
+  <!-- Products area -->
+  <div id="products-area">
+    <div class="loading">טוען נתונים... אם הדף נטען ריק, הגדר את ה-Google Sheets בסרגל הצד.</div>
+  </div>
+
+  <div style="height: 80px;"></div>
+
+  <!-- Finish button -->
+  <button id="finish-btn" onclick="showSummary()">
+    ✅ סיום רשימת קניות <span id="finish-count">0</span>
+  </button>
+</div>
+
+<!-- ====== MODAL ====== -->
+<div class="modal-overlay" id="modal" style="display:none">
+  <div class="modal-box">
+    <h3>📋 רשימת הקניות שלך</h3>
+    <div class="modal-list" id="modal-content"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-primary" onclick="copyAndClose()">📋 העתק ✓ אישור</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== DATA ======
+let products = [];    // { id, name, category, qty, unit, note, shabbat }
+let cartItems = {};   // id -> { qty, added }
+let shabbatActive = false;
+let editingId = null;
+
+const STORAGE_KEY = 'shopping_products_v2';
+const CART_KEY = 'shopping_cart_v2';
+
+// ====== CATEGORY COLORS ======
+const catColors = {};
+let catColorIndex = 0;
+
+function getCatColor(cat) {
+  if (!catColors[cat]) {
+    catColors[cat] = catColorIndex % 9;
+    catColorIndex++;
+  }
+  return catColors[cat];
+}
+
+// ====== GOOGLE SHEETS ======
+function extractSheetId(url) {
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+function extractGid(url) {
+  const m = url.match(/[?&]gid=(\d+)/);
+  return m ? m[1] : '0';
+}
+
+function buildCsvUrl(url) {
+  const id = extractSheetId(url);
+  const gid = extractGid(url);
+  if (!id) return null;
+  return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split('\n');
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    // Simple CSV parse (handles quotes)
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let c = 0; c < line.length; c++) {
+      if (line[c] === '"') { inQ = !inQ; }
+      else if (line[c] === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += line[c];
+    }
+    cols.push(cur.trim());
+    // Expected columns: name, category, qty, unit, note, shabbat
+    const [name, category, qty, unit, note, shabbat] = cols;
+    if (!name) continue;
+    rows.push({
+      id: 'gs_' + i + '_' + Math.random().toString(36).slice(2),
+      name: name || '',
+      category: category || 'כללי',
+      qty: parseFloat(qty) || 1,
+      unit: unit || '',
+      note: note || '',
+      shabbat: (shabbat || '').toLowerCase().trim() === 'yes' || (shabbat || '').toLowerCase().trim() === 'כן'
+    });
+  }
+  return rows;
+}
+
+async function loadFromSheets() {
+  const mainUrl = document.getElementById('sheets-url').value.trim();
+  const shabbatUrl = document.getElementById('sheets-shabbat-url').value.trim();
+  const status = document.getElementById('sheets-status');
+
+  if (!mainUrl) { status.textContent = 'נא הכנס כתובת Google Sheets'; return; }
+
+  status.textContent = 'טוען...';
+
+  let allProducts = [];
+
+  try {
+    const csvUrl = buildCsvUrl(mainUrl);
+    if (!csvUrl) { status.textContent = 'קישור לא תקין'; return; }
+    const res = await fetch(csvUrl);
+    if (!res.ok) throw new Error('שגיאה בטעינת הקובץ. ודא שהגיליון ציבורי.');
+    const text = await res.text();
+    allProducts = parseCSV(text);
+  } catch (e) {
+    status.style.color = '#e44';
+    status.textContent = 'שגיאה: ' + e.message;
+    return;
+  }
+
+  if (shabbatUrl) {
+    try {
+      const csvUrl = buildCsvUrl(shabbatUrl);
+      if (csvUrl) {
+        const res = await fetch(csvUrl);
+        if (res.ok) {
+          const text = await res.text();
+          const shabbatProducts = parseCSV(text).map(p => ({ ...p, shabbat: true }));
+          allProducts = [...allProducts, ...shabbatProducts];
+        }
+      }
+    } catch (e) { /* ignore shabbat error */ }
+  }
+
+  products = allProducts;
+  saveProducts();
+  status.style.color = '#2e7d32';
+  status.textContent = `✓ נטענו ${products.length} מוצרים`;
+  render();
+}
+
+// ====== LOCAL STORAGE ======
+function saveProducts() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  localStorage.setItem('sheets-url', document.getElementById('sheets-url').value);
+  localStorage.setItem('sheets-shabbat-url', document.getElementById('sheets-shabbat-url').value);
+}
+
+function loadSaved() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) products = JSON.parse(saved);
+  const savedCart = localStorage.getItem(CART_KEY);
+  if (savedCart) cartItems = JSON.parse(savedCart);
+  const su = localStorage.getItem('sheets-url');
+  if (su) document.getElementById('sheets-url').value = su;
+  const ssu = localStorage.getItem('sheets-shabbat-url');
+  if (ssu) document.getElementById('sheets-shabbat-url').value = ssu;
+}
+
+// ====== PRODUCT MANAGEMENT ======
+function saveProduct() {
+  const name = document.getElementById('f-name').value.trim();
+  const cat = document.getElementById('f-cat').value.trim() || 'כללי';
+  const qty = parseFloat(document.getElementById('f-qty').value) || 1;
+  const unit = document.getElementById('f-unit').value.trim();
+  const note = document.getElementById('f-note').value.trim();
+  const shabbat = document.getElementById('f-shabbat').value === 'yes';
+
+  if (!name) { document.getElementById('form-msg').textContent = 'נא הכנס שם מוצר'; return; }
+  document.getElementById('form-msg').textContent = '';
+
+  if (editingId) {
+    const p = products.find(x => x.id === editingId);
+    if (p) { p.name = name; p.category = cat; p.qty = qty; p.unit = unit; p.note = note; p.shabbat = shabbat; }
+    editingId = null;
+    document.getElementById('form-title').textContent = '➕ הוסף מוצר';
+  } else {
+    products.push({ id: 'p_' + Date.now(), name, category: cat, qty, unit, note, shabbat });
+  }
+  clearForm();
+  saveProducts();
+  render();
+}
+
+function cancelEdit() { editingId = null; document.getElementById('form-title').textContent = '➕ הוסף מוצר'; clearForm(); }
+
+function clearForm() {
+  ['f-name','f-cat','f-qty','f-unit','f-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-shabbat').value = 'no';
+  document.getElementById('form-msg').textContent = '';
+}
+
+function editProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-cat').value = p.category;
+  document.getElementById('f-qty').value = p.qty;
+  document.getElementById('f-unit').value = p.unit || '';
+  document.getElementById('f-note').value = p.note || '';
+  document.getElementById('f-shabbat').value = p.shabbat ? 'yes' : 'no';
+  document.getElementById('form-title').textContent = '✏️ ערוך מוצר';
+  document.getElementById('f-name').focus();
+}
+
+function deleteProduct(id) {
+  if (!confirm('למחוק מוצר זה?')) return;
+  products = products.filter(x => x.id !== id);
+  delete cartItems[id];
+  saveProducts();
+  render();
+}
+
+// ====== CART ======
+function addToCart(id, delta = 0) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const qty = p.qty + delta;
+  if (cartItems[id]) {
+    delete cartItems[id];
+  } else {
+    cartItems[id] = { qty: Math.max(0, qty) };
+  }
+  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+  renderProductRow(id);
+  updateFinishCount();
+}
+
+function changeQty(id, change) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const current = cartItems[id];
+  if (!current) {
+    cartItems[id] = { qty: Math.max(0, p.qty + change) };
+  } else {
+    current.qty = Math.max(0, current.qty + change);
+    if (current.qty === 0) delete cartItems[id];
+  }
+  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+  renderProductRow(id);
+  updateFinishCount();
+}
+
+// ====== SHABBAT ======
+function toggleShabbat() {
+  shabbatActive = !shabbatActive;
+  const btn = document.getElementById('shabbat-toggle-btn');
+  const shabbatProds = products.filter(p => p.shabbat);
+
+  if (shabbatActive) {
+    shabbatProds.forEach(p => { if (!cartItems[p.id]) cartItems[p.id] = { qty: p.qty }; });
+    btn.textContent = 'הסר מהרשימה';
+    btn.className = 'shabbat-add-btn active';
+    document.getElementById('shabbat-count-label').textContent = `נוספו ${shabbatProds.length} פריטי שבת לרשימה`;
+  } else {
+    shabbatProds.forEach(p => delete cartItems[p.id]);
+    btn.textContent = 'הוסף לרשימה';
+    btn.className = 'shabbat-add-btn inactive';
+    document.getElementById('shabbat-count-label').textContent = 'לחץ להוסיף את כל פריטי השבת לרשימה';
+  }
+  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+  render();
+}
+
+// ====== RENDER ======
+function render() {
+  renderSidebar();
+  renderMain();
+  updateFinishCount();
+}
+
+function renderSidebar() {
+  const categories = [...new Set(products.map(p => p.category))].sort();
+
+  // Update datalist
+  const dl = document.getElementById('cat-list');
+  dl.innerHTML = categories.map(c => `<option value="${esc(c)}">`).join('');
+
+  document.getElementById('sidebar-count').textContent = `${products.length} מוצרים`;
+  const container = document.getElementById('sidebar-items');
+
+  if (products.length === 0) {
+    container.innerHTML = '<div class="empty-state">אין מוצרים. הוסף מוצרים מהטופס או טען מ-Google Sheets.</div>';
+    return;
+  }
+
+  let html = '';
+  categories.forEach(cat => {
+    const catProds = products.filter(p => p.category === cat);
+    const ci = getCatColor(cat);
+    html += `<div style="font-size:11px; color:#aaa; margin: 8px 0 4px;">${esc(cat)}</div>`;
+    catProds.forEach(p => {
+      html += `<div class="sidebar-product-item" style="background:var(--cat-color-${ci})20">
+        <span style="font-size:13px">${esc(p.name)}</span>
+        <div class="item-actions">
+          <button class="edit-btn" onclick="editProduct('${p.id}')" title="ערוך">✏️</button>
+          <button class="del-btn" onclick="deleteProduct('${p.id}')" title="מחק">🗑️</button>
+        </div>
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function renderMain() {
+  const area = document.getElementById('products-area');
+  const nonShabbat = products.filter(p => !p.shabbat);
+
+  if (nonShabbat.length === 0 && products.length === 0) {
+    area.innerHTML = '<div class="empty-state">טען מוצרים מ-Google Sheets או הוסף ידנית מהסרגל הצד.</div>';
+    return;
+  }
+
+  const categories = [...new Set(nonShabbat.map(p => p.category))].sort();
+  let html = '';
+  categories.forEach(cat => {
+    const ci = getCatColor(cat);
+    const catProds = nonShabbat.filter(p => p.category === cat);
+    html += `<div class="category-block">
+      <span class="category-title" style="background:var(--cat-color-${ci}); color:var(--cat-color-badge-${ci})">${esc(cat)}</span>`;
+    catProds.forEach(p => {
+      html += buildProductRowHTML(p);
+    });
+    html += '</div>';
+  });
+
+  // Shabbat items as separate section if active
+  if (shabbatActive) {
+    const shabbatProds = products.filter(p => p.shabbat);
+    if (shabbatProds.length > 0) {
+      const shabbatCats = [...new Set(shabbatProds.map(p => p.category))].sort();
+      html += `<div class="category-block"><span class="category-title" style="background:#fff8e1; color:#f57f17">✡️ קניות שבת</span>`;
+      shabbatProds.forEach(p => { html += buildProductRowHTML(p); });
+      html += '</div>';
+    }
+  }
+
+  area.innerHTML = html;
+}
+
+function buildProductRowHTML(p) {
+  const ci = getCatColor(p.category);
+  const inCart = cartItems[p.id];
+  const displayQty = inCart ? inCart.qty : p.qty;
+  const addedClass = inCart ? 'added' : '';
+  const btnText = inCart ? 'הסר' : 'הוסף';
+  const btnClass = inCart ? 'add-btn-main added-state' : 'add-btn-main';
+  const qtyLabel = inCart ? `<span class="qty-indicator">${displayQty}${p.unit ? ' ' + esc(p.unit) : ''}</span>` : `<span class="product-qty-default">${p.qty}${p.unit ? ' ' + esc(p.unit) : ''}</span>`;
+  const noteHtml = p.note ? `<div class="product-note">${esc(p.note)}</div>` : '';
+
+  return `<div class="product-row ${addedClass}" id="row-${p.id}" style="background:var(--cat-color-${ci}); border-color: ${inCart ? `var(--cat-color-badge-${ci})` : 'transparent'}">
+    <div style="flex:1">
+      <div class="product-name">${esc(p.name)}</div>
+      ${noteHtml}
+    </div>
+    ${qtyLabel}
+    <div class="row-actions">
+      <button class="qty-btn minus" onclick="changeQty('${p.id}', -1)" title="פחות">−</button>
+      <button class="${btnClass}" onclick="addToCart('${p.id}')">${btnText}</button>
+      <button class="qty-btn plus" onclick="changeQty('${p.id}', 1)" title="יותר">+</button>
+    </div>
+  </div>`;
+}
+
+function renderProductRow(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const el = document.getElementById('row-' + id);
+  if (!el) return;
+  const ci = getCatColor(p.category);
+  const inCart = cartItems[id];
+  const displayQty = inCart ? inCart.qty : p.qty;
+  const btnText = inCart ? 'הסר' : 'הוסף';
+  const btnClass = inCart ? 'add-btn-main added-state' : 'add-btn-main';
+  const qtyLabel = inCart ? `<span class="qty-indicator">${displayQty}${p.unit ? ' ' + esc(p.unit) : ''}</span>` : `<span class="product-qty-default">${p.qty}${p.unit ? ' ' + esc(p.unit) : ''}</span>`;
+  const noteHtml = p.note ? `<div class="product-note">${esc(p.note)}</div>` : '';
+
+  el.className = `product-row ${inCart ? 'added' : ''}`;
+  el.style.background = `var(--cat-color-${ci})`;
+  el.style.borderColor = inCart ? `var(--cat-color-badge-${ci})` : 'transparent';
+  el.innerHTML = `<div style="flex:1">
+      <div class="product-name">${esc(p.name)}</div>
+      ${noteHtml}
+    </div>
+    ${qtyLabel}
+    <div class="row-actions">
+      <button class="qty-btn minus" onclick="changeQty('${p.id}', -1)" title="פחות">−</button>
+      <button class="${btnClass}" onclick="addToCart('${p.id}')">${btnText}</button>
+      <button class="qty-btn plus" onclick="changeQty('${p.id}', 1)" title="יותר">+</button>
+    </div>`;
+}
+
+function updateFinishCount() {
+  document.getElementById('finish-count').textContent = Object.keys(cartItems).length;
+}
+
+// ====== SUMMARY ======
+function showSummary() {
+  const items = Object.entries(cartItems);
+  if (items.length === 0) { alert('לא נבחרו פריטים עדיין.'); return; }
+
+  const lines = items.map(([id, item]) => {
+    const p = products.find(x => x.id === id);
+    if (!p) return null;
+    let line = `${p.name} - ${item.qty}`;
+    if (p.unit) line += ` ${p.unit}`;
+    if (p.note) line += ` (${p.note})`;
+    return line;
+  }).filter(Boolean);
+
+  document.getElementById('modal-content').textContent = lines.join('\n');
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+function copyAndClose() {
+  const text = document.getElementById('modal-content').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('הרשימה הועתקה ללוח! ✓');
+    closeModal();
+    cartItems = {};
+    localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+    shabbatActive = false;
+    document.getElementById('shabbat-toggle-btn').textContent = 'הוסף לרשימה';
+    document.getElementById('shabbat-toggle-btn').className = 'shabbat-add-btn inactive';
+    document.getElementById('shabbat-count-label').textContent = 'לחץ להוסיף את כל פריטי השבת לרשימה';
+    render();
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('הרשימה הועתקה ללוח! ✓');
+    closeModal();
+    cartItems = {};
+    localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+    render();
+  });
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ====== INIT ======
+loadSaved();
+render();
+
+if (products.length === 0) {
+  // Add demo products so the UI isn't empty
+  products = [
+    { id: 'demo1', name: 'עגבניות', category: 'ירקות', qty: 30, unit: '', note: 'אדומות וקשות', shabbat: false },
+    { id: 'demo2', name: 'חצילים', category: 'ירקות', qty: 10, unit: '', note: '', shabbat: false },
+    { id: 'demo3', name: 'תפו"א אדום', category: 'ירקות', qty: 3, unit: 'ק"ג', note: '', shabbat: false },
+    { id: 'demo4', name: 'מלפפונים', category: 'ירקות', qty: 30, unit: '', note: 'קטנים וקשים', shabbat: false },
+    { id: 'demo5', name: 'בננות', category: 'פירות', qty: 10, unit: '', note: '', shabbat: false },
+    { id: 'demo6', name: 'תפוחים', category: 'פירות', qty: 8, unit: '', note: 'פינק ליידי', shabbat: false },
+    { id: 'demo7', name: 'חלב 3%', category: 'חלב וגבינות', qty: 4, unit: 'ליטר', note: '', shabbat: false },
+    { id: 'demo8', name: 'לחם שיפון', category: 'לחם ומאפים', qty: 2, unit: '', note: '', shabbat: false },
+    { id: 'demo9', name: 'חלה גדולה', category: 'לחם ומאפים', qty: 2, unit: '', note: '', shabbat: true },
+    { id: 'demo10', name: 'בשר טחון', category: 'בשר ועוף', qty: 500, unit: 'גרם', note: '', shabbat: true },
+    { id: 'demo11', name: 'פרגיות', category: 'בשר ועוף', qty: 1, unit: 'ק"ג', note: 'עם עור', shabbat: true },
+  ];
+  saveProducts();
+  render();
+}
+</script>
+</body>
+</html>
