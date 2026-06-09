@@ -69,8 +69,8 @@ body {
   border: 1.5px solid transparent;
   transition: opacity .2s, border-color .2s;
 }
-.product-row.added { opacity: .5; }
-.product-row.added .pname { text-decoration: line-through; }
+.product-row.added { opacity: 1; }
+.pcheck { color: #1a8c2e; font-size: 16px; margin-left: 6px; flex-shrink: 0; }
 
 .pinfo { flex: 1; min-width: 0; }
 .pname { font-size: 14px; font-weight: 600; }
@@ -532,9 +532,10 @@ function buildRowHTML(p) {
   const addedClass = inCart ? 'added' : '';
   const btnClass = inCart ? 'add-btn remove' : 'add-btn add';
   const btnText = inCart ? 'הסר' : 'הוסף';
+  const checkHtml = inCart ? `<span class="pcheck">✓</span>` : '';
   return `<div class="product-row ${addedClass}" id="row-${p.id}" style="background:var(--c${ci});border-color:${inCart?`var(--cb${ci})`:'transparent'}">
     <div class="pinfo">
-      <div class="pname">${esc(p.name)}</div>
+      <div style="display:flex;align-items:center">${checkHtml}<div class="pname">${esc(p.name)}</div></div>
       ${noteHtml}
       ${!inCart ? qtyHtml : ''}
     </div>
@@ -560,7 +561,8 @@ function renderProductRow(id) {
   el.className = `product-row ${inCart?'added':''}`;
   el.style.background = `var(--c${ci})`;
   el.style.borderColor = inCart ? `var(--cb${ci})` : 'transparent';
-  el.innerHTML = `<div class="pinfo"><div class="pname">${esc(p.name)}</div>${noteHtml}${!inCart?qtyHtml:''}</div>
+  const checkHtml2 = inCart ? `<span class="pcheck">✓</span>` : '';
+  el.innerHTML = `<div class="pinfo"><div style="display:flex;align-items:center">${checkHtml2}<div class="pname">${esc(p.name)}</div></div>${noteHtml}${!inCart?qtyHtml:''}</div>
     ${inCart?qtyHtml:''}
     <div class="row-actions">
       <button class="qty-btn minus" onclick="changeQty('${p.id}',-1)">−</button>
@@ -644,20 +646,7 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 // ===== INIT =====
 loadSaved();
 render();
-if (products.length === 0) {
-  products = [
-    {id:'d1',name:'עגבניות',category:'ירקות',qty:30,unit:'',note:'אדומות וקשות',shabbat:false},
-    {id:'d2',name:'חצילים',category:'ירקות',qty:10,unit:'',note:'',shabbat:false},
-    {id:'d3',name:'תפו"א אדום',category:'ירקות',qty:3,unit:'ק"ג',note:'',shabbat:false},
-    {id:'d4',name:'מלפפונים',category:'ירקות',qty:30,unit:'',note:'קטנים וקשים',shabbat:false},
-    {id:'d5',name:'בננות',category:'פירות',qty:10,unit:'',note:'',shabbat:false},
-    {id:'d6',name:'חלב 3%',category:'חלב וגבינות',qty:4,unit:'ליטר',note:'',shabbat:false},
-    {id:'d7',name:'לחם שיפון',category:'לחם ומאפים',qty:2,unit:'',note:'',shabbat:false},
-    {id:'d8',name:'חלה גדולה',category:'לחם ומאפים',qty:2,unit:'',note:'',shabbat:true},
-    {id:'d9',name:'פרגיות',category:'בשר ועוף',qty:1,unit:'ק"ג',note:'עם עור',shabbat:true},
-  ];
-  saveProducts(); render();
-}
+
 </script>
 </body>
 </html>
