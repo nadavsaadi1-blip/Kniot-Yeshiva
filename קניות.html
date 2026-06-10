@@ -6,25 +6,14 @@
 <title>רשימת קניות</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6fa; color: #222; min-height: 100vh; overflow-x: hidden; }
 
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f5f6fa;
-  color: #222;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ====== PAGES ====== */
 .page { display: none; min-height: 100vh; }
 .page.active { display: block; }
 
-/* ====== TOP BAR ====== */
 .topbar {
-  position: sticky; top: 0; z-index: 50;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  padding: 14px 16px;
+  position: sticky; top: 0; z-index: 50; background: #fff;
+  border-bottom: 1px solid #eee; padding: 14px 16px;
   display: flex; align-items: center; justify-content: space-between;
 }
 .topbar h1 { font-size: 18px; font-weight: 700; }
@@ -32,132 +21,86 @@ body {
   background: #f0f4ff; color: #3b6de4; border: none;
   border-radius: 20px; padding: 8px 14px; font-size: 13px;
   font-weight: 600; font-family: inherit; cursor: pointer;
-  display: flex; align-items: center; gap: 5px;
 }
 
-/* ====== SHABBAT CARD ====== */
+/* SHABBAT */
 .shabbat-card {
-  margin: 14px 14px 0;
-  background: #fffbea;
-  border: 2px solid #f5c518;
-  border-radius: 14px;
-  padding: 13px 16px;
+  margin: 14px 14px 0; background: #fffbea; border: 2px solid #f5c518;
+  border-radius: 14px; padding: 13px 16px;
   display: flex; align-items: center; justify-content: space-between;
 }
 .shabbat-title { font-size: 15px; font-weight: 700; color: #7a5c00; }
 .shabbat-sub { font-size: 11px; color: #a07800; margin-top: 2px; }
-.shabbat-toggle {
-  padding: 8px 14px; border-radius: 20px; border: none;
-  font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
-  white-space: nowrap;
-}
+.shabbat-toggle { padding: 8px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .shabbat-toggle.on { background: #f5c518; color: #3a2d00; }
 .shabbat-toggle.off { background: #eee; color: #666; }
 
-/* ====== CATEGORY ====== */
+/* CATEGORY */
 .category-block { margin: 16px 14px 0; }
-.cat-label {
-  font-size: 12px; font-weight: 700; letter-spacing: .4px;
-  padding: 4px 12px; border-radius: 20px; display: inline-block;
-  margin-bottom: 8px;
-}
+.cat-label { font-size: 12px; font-weight: 700; letter-spacing: .4px; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 8px; }
 
-/* ====== PRODUCT ROW ====== */
+/* PRODUCT ROW */
 .product-row {
-  display: flex; align-items: center;
   padding: 11px 12px; border-radius: 10px; margin-bottom: 5px;
-  border: 1.5px solid transparent;
-  transition: opacity .2s, border-color .2s;
+  border: 1.5px solid transparent; transition: border-color .2s;
 }
-.product-row.added { opacity: 1; }
-.pcheck { color: #1a8c2e; font-size: 16px; margin-left: 6px; flex-shrink: 0; }
-
+.product-row-top { display: flex; align-items: center; }
+.pcheck { color: #1a8c2e; font-size: 15px; margin-left: 6px; flex-shrink: 0; font-weight: 700; }
 .pinfo { flex: 1; min-width: 0; }
 .pname { font-size: 14px; font-weight: 600; }
 .pnote { font-size: 11px; color: #999; margin-top: 1px; }
 .pqty-default { font-size: 11px; color: #bbb; margin-top: 1px; }
 
-.row-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-
-.qty-btn {
-  width: 34px; height: 34px; border-radius: 8px;
-  border: 1px solid #e0e0e0; background: #fff;
-  font-size: 18px; font-weight: 700; color: #555;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0;
+/* ROW ACTIONS */
+.row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.qty-input {
+  width: 52px; height: 34px; border: 1px solid #ddd; border-radius: 8px;
+  text-align: center; font-size: 14px; font-weight: 600; font-family: inherit;
+  background: #fff; color: #222; direction: ltr;
 }
-.qty-btn.minus { color: #c00; border-color: #f5c0c0; background: #fff8f8; }
-.qty-btn.plus { color: #1a8c2e; border-color: #b0ddb8; background: #f4fbf5; }
-
-.add-btn {
-  padding: 7px 14px; border-radius: 8px; border: none;
-  font-size: 13px; font-weight: 700; font-family: inherit;
-  cursor: pointer; white-space: nowrap;
-}
+.qty-input:focus { outline: none; border-color: #3b6de4; }
+.add-btn { padding: 7px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; white-space: nowrap; }
 .add-btn.add { background: #3b6de4; color: #fff; }
 .add-btn.remove { background: #e44b4b; color: #fff; }
 
-.qty-badge {
-  font-size: 13px; font-weight: 700; color: #3b6de4;
-  min-width: 32px; text-align: center;
+/* MERGED ROW (shabbat + regular) */
+.merged-detail {
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,.07);
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
 }
+.merged-part { display: flex; align-items: center; gap: 5px; }
+.merged-label { font-size: 11px; color: #888; }
+.merged-qty { font-size: 13px; font-weight: 700; color: #3b6de4; min-width: 28px; text-align: center; }
+.remove-part-btn { font-size: 11px; color: #e44; background: none; border: 1px solid #f5c0c0; border-radius: 5px; padding: 2px 6px; cursor: pointer; font-family: inherit; }
 
-/* ====== FINISH BTN ====== */
+/* FINISH */
 #finish-btn {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   background: #1a8c2e; color: #fff; border: none; border-radius: 28px;
-  padding: 15px 32px; font-size: 15px; font-weight: 700;
-  font-family: inherit; cursor: pointer;
-  box-shadow: 0 4px 20px rgba(26,140,46,.35);
-  z-index: 100; display: flex; align-items: center; gap: 8px;
-  white-space: nowrap;
+  padding: 15px 32px; font-size: 15px; font-weight: 700; font-family: inherit;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(26,140,46,.35);
+  z-index: 100; display: flex; align-items: center; gap: 8px; white-space: nowrap;
 }
-#finish-count {
-  background: rgba(255,255,255,.25); border-radius: 12px;
-  padding: 1px 8px; font-size: 13px;
-}
+#finish-count { background: rgba(255,255,255,.25); border-radius: 12px; padding: 1px 8px; font-size: 13px; }
 .bottom-spacer { height: 90px; }
 
-/* ====== MODAL ====== */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.5);
-  display: flex; align-items: flex-end; justify-content: center;
-  z-index: 999; direction: rtl;
-}
-.modal-box {
-  background: #fff; border-radius: 20px 20px 0 0;
-  padding: 24px 20px; width: 100%; max-height: 80vh;
-  overflow-y: auto;
-}
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: flex-end; justify-content: center; z-index: 999; direction: rtl; }
+.modal-box { background: #fff; border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-height: 80vh; overflow-y: auto; }
 .modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
-.modal-list {
-  background: #f8f9fa; border-radius: 10px;
-  padding: 14px 16px; font-size: 14px; line-height: 2;
-  white-space: pre-wrap; direction: rtl; font-family: monospace;
-}
+.modal-list { background: #f8f9fa; border-radius: 10px; padding: 14px 16px; font-size: 14px; line-height: 2; white-space: pre-wrap; direction: rtl; font-family: monospace; }
 .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
 .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; }
 .modal-cancel { background: #f0f0f0; color: #444; }
 .modal-confirm { background: #1a8c2e; color: #fff; }
 
-/* ====== ADMIN PAGE ====== */
-.admin-section {
-  background: #fff; margin: 14px; border-radius: 14px;
-  border: 1px solid #eee; overflow: hidden;
-}
-.admin-section-title {
-  font-size: 13px; font-weight: 700; color: #888;
-  padding: 12px 16px 8px; border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
-}
+/* ADMIN */
+.admin-section { background: #fff; margin: 14px; border-radius: 14px; border: 1px solid #eee; overflow: hidden; }
+.admin-section-title { font-size: 13px; font-weight: 700; color: #888; padding: 12px 16px 8px; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
 .admin-form { padding: 14px 16px; }
 .admin-form label { font-size: 12px; color: #888; display: block; margin-bottom: 3px; margin-top: 10px; }
 .admin-form label:first-child { margin-top: 0; }
-.admin-form input, .admin-form select, .admin-form textarea {
-  width: 100%; padding: 10px 12px; border: 1px solid #ddd;
-  border-radius: 8px; font-size: 14px; font-family: inherit;
-  direction: rtl; background: #fafafa;
-}
+.admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; direction: rtl; background: #fafafa; }
 .admin-form textarea { resize: vertical; min-height: 60px; }
 .admin-form .form-row { display: flex; gap: 8px; }
 .admin-form .form-row > div { flex: 1; }
@@ -166,53 +109,31 @@ body {
 .btn-save { background: #3b6de4; color: #fff; }
 .btn-cancel { background: #f0f0f0; color: #555; }
 .form-msg { font-size: 12px; color: #e44; margin-top: 6px; }
-
-.sheets-status { font-size: 12px; margin-top: 6px; color: #888; }
+.sheets-status { font-size: 12px; margin-top: 6px; }
 .sheets-hint { font-size: 11px; color: #bbb; margin-top: 6px; line-height: 1.6; }
-
-/* Product list in admin */
-.admin-product-item {
-  display: flex; align-items: center;
-  padding: 11px 16px; border-bottom: 1px solid #f5f5f5;
-}
+.admin-product-item { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid #f5f5f5; }
 .admin-product-item:last-child { border-bottom: none; }
-.api-name { flex: 1; font-size: 14px; font-weight: 500; }
-.api-cat { font-size: 11px; color: #aaa; margin-top: 1px; }
 .api-actions { display: flex; gap: 6px; }
-.api-actions button {
-  background: none; border: 1px solid #eee; border-radius: 6px;
-  padding: 5px 10px; font-size: 12px; cursor: pointer; font-family: inherit;
-}
+.api-actions button { background: none; border: 1px solid #eee; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
 .api-edit { color: #3b6de4; }
 .api-del { color: #e44b4b; }
-
 .empty-state { text-align: center; color: #ccc; font-size: 14px; padding: 30px; }
 
-/* ====== CATEGORY COLORS ====== */
 :root {
-  --c0: #e3f0ff; --cb0: #3b6de4;
-  --c1: #e8f8e8; --cb1: #2e7d32;
-  --c2: #fff3e0; --cb2: #e65100;
-  --c3: #fce4ec; --cb3: #c2185b;
-  --c4: #ede7f6; --cb4: #6a1b9a;
-  --c5: #e0f7fa; --cb5: #00838f;
-  --c6: #f9fbe7; --cb6: #558b2f;
-  --c7: #fff8e1; --cb7: #f57f17;
-  --c8: #fce4ec; --cb8: #880e4f;
+  --c0:#e3f0ff;--cb0:#3b6de4;--c1:#e8f8e8;--cb1:#2e7d32;--c2:#fff3e0;--cb2:#e65100;
+  --c3:#fce4ec;--cb3:#c2185b;--c4:#ede7f6;--cb4:#6a1b9a;--c5:#e0f7fa;--cb5:#00838f;
+  --c6:#f9fbe7;--cb6:#558b2f;--c7:#fff8e1;--cb7:#f57f17;--c8:#fce4ec;--cb8:#880e4f;
 }
 </style>
 </head>
 <body>
 
-<!-- ========== PAGE: MAIN ========== -->
+<!-- MAIN PAGE -->
 <div class="page active" id="page-main">
-
   <div class="topbar">
     <h1>🛒 רשימת קניות</h1>
     <button class="topbar-btn" onclick="goToAdmin()">⚙️ עריכת מוצרים</button>
   </div>
-
-  <!-- Shabbat -->
   <div class="shabbat-card">
     <div>
       <div class="shabbat-title">✡️ קניות שבת</div>
@@ -220,27 +141,18 @@ body {
     </div>
     <button class="shabbat-toggle off" id="shabbat-btn" onclick="toggleShabbat()">הוסף</button>
   </div>
-
-  <!-- Products -->
   <div id="products-area"></div>
   <div class="bottom-spacer"></div>
-
-  <!-- Finish -->
-  <button id="finish-btn" onclick="showSummary()">
-    ✅ סיום רשימה <span id="finish-count">0</span>
-  </button>
+  <button id="finish-btn" onclick="showSummary()">✅ סיום רשימה <span id="finish-count">0</span></button>
 </div>
 
-<!-- ========== PAGE: ADMIN ========== -->
+<!-- ADMIN PAGE -->
 <div class="page" id="page-admin">
-
   <div class="topbar">
     <button class="topbar-btn" onclick="goToMain()">← חזרה</button>
     <h1>⚙️ עריכת מוצרים</h1>
     <div style="width:80px"></div>
   </div>
-
-  <!-- Sheets -->
   <div class="admin-section">
     <div class="admin-section-title">🔗 חיבור Google Sheets</div>
     <div class="admin-form">
@@ -253,8 +165,6 @@ body {
       <div class="sheets-hint">שתף את הגיליון ← "כל מי שיש לו קישור" ← צופה</div>
     </div>
   </div>
-
-  <!-- Add/Edit form -->
   <div class="admin-section">
     <div class="admin-section-title" id="form-title">➕ הוסף מוצר</div>
     <div class="admin-form">
@@ -264,22 +174,13 @@ body {
       <input type="text" id="f-cat" placeholder="ירקות, פירות, חלב..." list="cat-list" />
       <datalist id="cat-list"></datalist>
       <div class="form-row">
-        <div>
-          <label>כמות</label>
-          <input type="number" id="f-qty" placeholder="10" min="0" />
-        </div>
-        <div>
-          <label>יחידה</label>
-          <input type="text" id="f-unit" placeholder='ק"ג, יח&apos;...' />
-        </div>
+        <div><label>כמות</label><input type="number" id="f-qty" placeholder="10" min="0" /></div>
+        <div><label>יחידה</label><input type="text" id="f-unit" placeholder='ק"ג, יח&apos;...' /></div>
       </div>
       <label>הערה (אופציונלי)</label>
       <textarea id="f-note" placeholder="קטנים וקשים, אדומים..."></textarea>
       <label>שייך לשבת?</label>
-      <select id="f-shabbat">
-        <option value="no">לא</option>
-        <option value="yes">כן</option>
-      </select>
+      <select id="f-shabbat"><option value="no">לא</option><option value="yes">כן</option></select>
       <div class="form-btns">
         <button class="btn-save" onclick="saveProduct()">💾 שמור</button>
         <button class="btn-cancel" onclick="cancelEdit()">ביטול</button>
@@ -287,17 +188,14 @@ body {
       <div class="form-msg" id="form-msg"></div>
     </div>
   </div>
-
-  <!-- Product list -->
   <div class="admin-section">
     <div class="admin-section-title" id="admin-count">רשימת מוצרים</div>
     <div id="admin-product-list"></div>
   </div>
-
   <div style="height:30px"></div>
 </div>
 
-<!-- ========== MODAL ========== -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modal" style="display:none">
   <div class="modal-box">
     <h3>📋 רשימת הקניות שלך</h3>
@@ -311,14 +209,16 @@ body {
 
 <script>
 let products = [];
+// cartItems: id -> { qtyRegular, qtyShabbat }
+// if only regular: { qtyRegular: N, qtyShabbat: 0 }
+// if merged: both > 0
 let cartItems = {};
 let shabbatActive = false;
 let editingId = null;
 
-const STORAGE_KEY = 'shopping_v3_products';
-const CART_KEY = 'shopping_v3_cart';
+const STORAGE_KEY = 'shopping_v4_products';
+const CART_KEY = 'shopping_v4_cart';
 
-// category color index
 const catColorMap = {};
 let catColorIdx = 0;
 function getCatCI(cat) {
@@ -326,31 +226,16 @@ function getCatCI(cat) {
   return catColorMap[cat];
 }
 
-// ===== NAVIGATION =====
-function goToAdmin() {
-  document.getElementById('page-main').classList.remove('active');
-  document.getElementById('page-admin').classList.add('active');
-  renderAdmin();
-  window.scrollTo(0,0);
-}
-function goToMain() {
-  document.getElementById('page-admin').classList.remove('active');
-  document.getElementById('page-main').classList.add('active');
-  render();
-  window.scrollTo(0,0);
-}
+// NAV
+function goToAdmin() { document.getElementById('page-main').classList.remove('active'); document.getElementById('page-admin').classList.add('active'); renderAdmin(); window.scrollTo(0,0); }
+function goToMain() { document.getElementById('page-admin').classList.remove('active'); document.getElementById('page-main').classList.add('active'); render(); window.scrollTo(0,0); }
 
-// ===== SHEETS =====
+// SHEETS
 function extractSheetId(url) { const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/); return m ? m[1] : null; }
 function extractGid(url) { const m = url.match(/[?&]gid=(\d+)/); return m ? m[1] : '0'; }
-function buildCsvUrl(url) {
-  const id = extractSheetId(url);
-  if (!id) return null;
-  return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${extractGid(url)}`;
-}
+function buildCsvUrl(url) { const id = extractSheetId(url); if (!id) return null; return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${extractGid(url)}`; }
 function parseCSV(text, forceShabbat) {
-  const rows = [];
-  const lines = text.split('\n');
+  const rows = []; const lines = text.split('\n');
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim(); if (!line) continue;
     const cols = []; let cur = '', inQ = false;
@@ -366,7 +251,6 @@ function parseCSV(text, forceShabbat) {
   }
   return rows;
 }
-
 async function loadFromSheets() {
   const mainUrl = document.getElementById('sheets-url').value.trim();
   const shabbatUrl = document.getElementById('sheets-shabbat-url').value.trim();
@@ -387,27 +271,30 @@ async function loadFromSheets() {
       if (csvUrl) { const res = await fetch(csvUrl); if (res.ok) all = [...all, ...parseCSV(await res.text(), true)]; }
     } catch(e) {}
   }
-  products = all;
-  saveProducts();
-  status.style.color='#2e7d32';
-  status.textContent=`✓ נטענו ${products.length} מוצרים`;
+  products = all; saveProducts();
+  status.style.color='#2e7d32'; status.textContent=`✓ נטענו ${products.length} מוצרים`;
   renderAdmin();
 }
 
-// ===== STORAGE =====
+// STORAGE
 function saveProducts() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  const su = document.getElementById('sheets-url'); if(su) localStorage.setItem('sv3-sheets', su.value);
-  const ssu = document.getElementById('sheets-shabbat-url'); if(ssu) localStorage.setItem('sv3-sheets-shabbat', ssu.value);
+  const su = document.getElementById('sheets-url'); if(su) localStorage.setItem('sv4-sheets', su.value);
+  const ssu = document.getElementById('sheets-shabbat-url'); if(ssu) localStorage.setItem('sv4-shabbat', ssu.value);
 }
 function loadSaved() {
   const p = localStorage.getItem(STORAGE_KEY); if(p) products = JSON.parse(p);
   const c = localStorage.getItem(CART_KEY); if(c) cartItems = JSON.parse(c);
-  const su = localStorage.getItem('sv3-sheets'); if(su) { const el = document.getElementById('sheets-url'); if(el) el.value=su; }
-  const ssu = localStorage.getItem('sv3-sheets-shabbat'); if(ssu) { const el = document.getElementById('sheets-shabbat-url'); if(el) el.value=ssu; }
+  // migrate old cart format
+  Object.keys(cartItems).forEach(id => {
+    const v = cartItems[id];
+    if (typeof v === 'object' && v.qty !== undefined) cartItems[id] = { qtyRegular: v.qty, qtyShabbat: 0 };
+    if (typeof v === 'number') cartItems[id] = { qtyRegular: v, qtyShabbat: 0 };
+  });
 }
+function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cartItems)); }
 
-// ===== PRODUCT CRUD =====
+// PRODUCT CRUD
 function saveProduct() {
   const name = document.getElementById('f-name').value.trim();
   const cat = document.getElementById('f-cat').value.trim() || 'כללי';
@@ -420,8 +307,7 @@ function saveProduct() {
   if (editingId) {
     const p = products.find(x => x.id === editingId);
     if (p) Object.assign(p, {name, category:cat, qty, unit, note, shabbat});
-    editingId = null;
-    document.getElementById('form-title').textContent = '➕ הוסף מוצר';
+    editingId = null; document.getElementById('form-title').textContent = '➕ הוסף מוצר';
   } else {
     products.push({ id:'p_'+Date.now(), name, category:cat, qty, unit, note, shabbat });
   }
@@ -437,14 +323,12 @@ function editProduct(id) {
   document.getElementById('f-note').value = p.note||'';
   document.getElementById('f-shabbat').value = p.shabbat ? 'yes' : 'no';
   document.getElementById('form-title').textContent = '✏️ ערוך מוצר';
-  document.getElementById('f-name').focus();
   document.getElementById('f-name').scrollIntoView({behavior:'smooth'});
 }
 function deleteProduct(id) {
   if (!confirm('למחוק?')) return;
   products = products.filter(x => x.id !== id);
-  delete cartItems[id];
-  saveProducts(); renderAdmin();
+  delete cartItems[id]; saveProducts(); renderAdmin();
 }
 function cancelEdit() { editingId = null; document.getElementById('form-title').textContent = '➕ הוסף מוצר'; clearForm(); }
 function clearForm() {
@@ -453,129 +337,204 @@ function clearForm() {
   document.getElementById('form-msg').textContent='';
 }
 
-// ===== CART =====
-function addToCart(id) {
-  const p = products.find(x => x.id === id); if (!p) return;
-  if (cartItems[id]) delete cartItems[id];
-  else cartItems[id] = { qty: p.qty };
-  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
-  renderProductRow(id); updateFinishCount();
-}
-function changeQty(id, change) {
-  const p = products.find(x => x.id === id); if (!p) return;
-  if (!cartItems[id]) cartItems[id] = { qty: p.qty };
-  cartItems[id].qty = Math.max(0, cartItems[id].qty + change);
-  if (cartItems[id].qty === 0) delete cartItems[id];
-  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
-  renderProductRow(id); updateFinishCount();
+// CART
+function getInputQty(id) {
+  const el = document.getElementById('input-'+id);
+  if (!el) return null;
+  const v = parseFloat(el.value);
+  return isNaN(v) || v <= 0 ? null : v;
 }
 
-// ===== SHABBAT =====
+function addToCart(id) {
+  const p = products.find(x => x.id === id); if (!p) return;
+  if (cartItems[id] && (cartItems[id].qtyRegular > 0 || cartItems[id].qtyShabbat > 0)) {
+    // remove regular part only
+    if (cartItems[id].qtyShabbat > 0) {
+      cartItems[id].qtyRegular = 0;
+    } else {
+      delete cartItems[id];
+    }
+  } else {
+    const qty = getInputQty(id) || p.qty;
+    if (!cartItems[id]) cartItems[id] = { qtyRegular: 0, qtyShabbat: 0 };
+    cartItems[id].qtyRegular = qty;
+  }
+  saveCart(); renderProductRow(id); updateFinishCount();
+}
+
+function removeShabbatPart(id) {
+  if (!cartItems[id]) return;
+  cartItems[id].qtyShabbat = 0;
+  if (cartItems[id].qtyRegular <= 0) delete cartItems[id];
+  saveCart(); renderProductRow(id); updateFinishCount();
+}
+
+function removeRegularPart(id) {
+  if (!cartItems[id]) return;
+  cartItems[id].qtyRegular = 0;
+  if (cartItems[id].qtyShabbat <= 0) delete cartItems[id];
+  saveCart(); renderProductRow(id); updateFinishCount();
+}
+
+// SHABBAT
+// find regular product matching a shabbat product by name
+function findRegularMatch(shabbatProduct) {
+  const nameLower = shabbatProduct.name.trim().toLowerCase();
+  return products.find(p => !p.shabbat && p.name.trim().toLowerCase() === nameLower);
+}
+
 function toggleShabbat() {
   shabbatActive = !shabbatActive;
   const btn = document.getElementById('shabbat-btn');
   const shabbatProds = products.filter(p => p.shabbat);
   if (shabbatActive) {
-    shabbatProds.forEach(p => { if (!cartItems[p.id]) cartItems[p.id] = { qty: p.qty }; });
+    shabbatProds.forEach(sp => {
+      const match = findRegularMatch(sp);
+      if (match) {
+        // merge into regular product's cart entry
+        if (!cartItems[match.id]) cartItems[match.id] = { qtyRegular: 0, qtyShabbat: 0 };
+        cartItems[match.id].qtyShabbat = sp.qty;
+        // if regular part wasn't added yet, keep qtyRegular as 0 (shabbat only)
+      } else {
+        // standalone shabbat product
+        if (!cartItems[sp.id]) cartItems[sp.id] = { qtyRegular: 0, qtyShabbat: sp.qty };
+        else cartItems[sp.id].qtyShabbat = sp.qty;
+      }
+    });
     btn.textContent = 'הסר'; btn.className = 'shabbat-toggle on';
     document.getElementById('shabbat-sub').textContent = `נוספו ${shabbatProds.length} פריטי שבת`;
   } else {
-    shabbatProds.forEach(p => delete cartItems[p.id]);
+    // remove shabbat parts
+    shabbatProds.forEach(sp => {
+      const match = findRegularMatch(sp);
+      const targetId = match ? match.id : sp.id;
+      if (cartItems[targetId]) {
+        cartItems[targetId].qtyShabbat = 0;
+        if (cartItems[targetId].qtyRegular <= 0) delete cartItems[targetId];
+      }
+    });
+    // also remove standalone shabbat products
+    shabbatProds.forEach(sp => {
+      if (cartItems[sp.id]) {
+        cartItems[sp.id].qtyShabbat = 0;
+        if (cartItems[sp.id].qtyRegular <= 0) delete cartItems[sp.id];
+      }
+    });
     btn.textContent = 'הוסף'; btn.className = 'shabbat-toggle off';
     document.getElementById('shabbat-sub').textContent = 'לחץ להוסיף את כל פריטי השבת';
   }
-  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
-  render();
+  saveCart(); render();
 }
 
-// ===== RENDER MAIN =====
-function render() {
-  renderProducts();
-  updateFinishCount();
+// check if this product has a shabbat counterpart merged into it
+function getShabbatCounterpart(p) {
+  if (p.shabbat) return null;
+  const nameLower = p.name.trim().toLowerCase();
+  return products.find(sp => sp.shabbat && sp.name.trim().toLowerCase() === nameLower) || null;
 }
+
+// RENDER
+function render() { renderProducts(); updateFinishCount(); }
 
 function renderProducts() {
   const area = document.getElementById('products-area');
   const nonShabbat = products.filter(p => !p.shabbat);
-  if (nonShabbat.length === 0 && products.length === 0) {
+  // also show standalone shabbat products (those with no regular match) when shabbatActive
+  const standaloneShabbat = shabbatActive
+    ? products.filter(p => p.shabbat && !findRegularMatch(p))
+    : [];
+
+  if (nonShabbat.length === 0 && !shabbatActive) {
     area.innerHTML = '<div class="empty-state">לחץ "עריכת מוצרים" כדי להוסיף מוצרים</div>';
     return;
   }
-  const cats = [...new Set(nonShabbat.map(p => p.category))].sort();
+
+  // collect all categories
+  const allProds = [...nonShabbat, ...standaloneShabbat];
+  const cats = [...new Set(allProds.map(p => p.category))].sort();
   let html = '';
   cats.forEach(cat => {
     const ci = getCatCI(cat);
+    const catProds = allProds.filter(p => p.category === cat);
     html += `<div class="category-block"><span class="cat-label" style="background:var(--c${ci});color:var(--cb${ci})">${esc(cat)}</span>`;
-    nonShabbat.filter(p => p.category === cat).forEach(p => { html += buildRowHTML(p); });
+    catProds.forEach(p => { html += buildRowHTML(p); });
     html += '</div>';
   });
-  if (shabbatActive) {
-    const sp = products.filter(p => p.shabbat);
-    if (sp.length) {
-      html += '<div class="category-block"><span class="cat-label" style="background:#fff8e1;color:#f57f17">✡️ קניות שבת</span>';
-      sp.forEach(p => { html += buildRowHTML(p); });
-      html += '</div>';
-    }
-  }
   area.innerHTML = html;
 }
 
 function buildRowHTML(p) {
   const ci = getCatCI(p.category);
-  const inCart = cartItems[p.id];
-  const dq = inCart ? inCart.qty : p.qty;
-  const unitStr = p.unit ? ' '+esc(p.unit) : '';
+  const item = cartItems[p.id] || { qtyRegular: 0, qtyShabbat: 0 };
+  const isAdded = item.qtyRegular > 0 || item.qtyShabbat > 0;
+  const totalQty = item.qtyRegular + item.qtyShabbat;
+  const isMerged = item.qtyRegular > 0 && item.qtyShabbat > 0;
+  const shabbatCounter = getShabbatCounterpart(p);
+  const hasShabbatMerge = !!shabbatCounter && isAdded;
+
   const noteHtml = p.note ? `<div class="pnote">${esc(p.note)}</div>` : '';
-  const qtyHtml = inCart
-    ? `<span class="qty-badge">${dq}${unitStr}</span>`
-    : `<div class="pqty-default">${p.qty}${unitStr}</div>`;
-  const addedClass = inCart ? 'added' : '';
-  const btnClass = inCart ? 'add-btn remove' : 'add-btn add';
-  const btnText = inCart ? 'הסר' : 'הוסף';
-  const checkHtml = inCart ? `<span class="pcheck">✓</span>` : '';
-  return `<div class="product-row ${addedClass}" id="row-${p.id}" style="background:var(--c${ci});border-color:${inCart?`var(--cb${ci})`:'transparent'}">
-    <div class="pinfo">
-      <div style="display:flex;align-items:center">${checkHtml}<div class="pname">${esc(p.name)}</div></div>
-      ${noteHtml}
-      ${!inCart ? qtyHtml : ''}
+  const checkHtml = isAdded ? `<span class="pcheck">✓</span>` : '';
+
+  // input field
+  const inputVal = isAdded ? totalQty : p.qty;
+  const unitStr = p.unit ? ' '+esc(p.unit) : '';
+  const inputHtml = `<input class="qty-input" id="input-${p.id}" type="number" value="${inputVal}" min="0" />`;
+
+  const btnClass = isAdded ? 'add-btn remove' : 'add-btn add';
+  const btnText = isAdded ? 'הסר' : 'הוסף';
+
+  // merged detail
+  let mergedHtml = '';
+  if (isMerged) {
+    mergedHtml = `<div class="merged-detail">
+      <div class="merged-part">
+        <span class="merged-label">רגיל:</span>
+        <span class="merged-qty">${item.qtyRegular}${unitStr}</span>
+        <button class="remove-part-btn" onclick="removeRegularPart('${p.id}')">הסר</button>
+      </div>
+      <div class="merged-part">
+        <span class="merged-label">שבת:</span>
+        <span class="merged-qty">${item.qtyShabbat}${unitStr}</span>
+        <button class="remove-part-btn" onclick="removeShabbatPart('${p.id}')">הסר</button>
+      </div>
+    </div>`;
+  } else if (item.qtyShabbat > 0 && item.qtyRegular === 0) {
+    mergedHtml = `<div class="merged-detail">
+      <div class="merged-part">
+        <span class="merged-label">שבת בלבד:</span>
+        <span class="merged-qty">${item.qtyShabbat}${unitStr}</span>
+        <button class="remove-part-btn" onclick="removeShabbatPart('${p.id}')">הסר</button>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="product-row" id="row-${p.id}" style="background:var(--c${ci});border-color:${isAdded?`var(--cb${ci})`:'transparent'}">
+    <div class="product-row-top">
+      <div class="pinfo">
+        <div style="display:flex;align-items:center">${checkHtml}<div class="pname">${esc(p.name)}</div></div>
+        ${noteHtml}
+        ${!isAdded ? `<div class="pqty-default">${p.qty}${unitStr}</div>` : ''}
+      </div>
+      <div class="row-actions">
+        ${inputHtml}
+        <button class="${btnClass}" onclick="addToCart('${p.id}')">${btnText}</button>
+      </div>
     </div>
-    ${inCart ? qtyHtml : ''}
-    <div class="row-actions">
-      <button class="qty-btn minus" onclick="changeQty('${p.id}',-1)">−</button>
-      <button class="${btnClass}" onclick="addToCart('${p.id}')">${btnText}</button>
-      <button class="qty-btn plus" onclick="changeQty('${p.id}',1)">+</button>
-    </div>
+    ${mergedHtml}
   </div>`;
 }
 
 function renderProductRow(id) {
   const el = document.getElementById('row-'+id); if (!el) return;
   const p = products.find(x => x.id === id); if (!p) return;
-  const ci = getCatCI(p.category);
-  const inCart = cartItems[id];
-  const dq = inCart ? inCart.qty : p.qty;
-  const unitStr = p.unit ? ' '+esc(p.unit) : '';
-  const noteHtml = p.note ? `<div class="pnote">${esc(p.note)}</div>` : '';
-  const qtyHtml = inCart ? `<span class="qty-badge">${dq}${unitStr}</span>` : `<div class="pqty-default">${p.qty}${unitStr}</div>`;
-  const btnClass = inCart ? 'add-btn remove' : 'add-btn add';
-  el.className = `product-row ${inCart?'added':''}`;
-  el.style.background = `var(--c${ci})`;
-  el.style.borderColor = inCart ? `var(--cb${ci})` : 'transparent';
-  const checkHtml2 = inCart ? `<span class="pcheck">✓</span>` : '';
-  el.innerHTML = `<div class="pinfo"><div style="display:flex;align-items:center">${checkHtml2}<div class="pname">${esc(p.name)}</div></div>${noteHtml}${!inCart?qtyHtml:''}</div>
-    ${inCart?qtyHtml:''}
-    <div class="row-actions">
-      <button class="qty-btn minus" onclick="changeQty('${p.id}',-1)">−</button>
-      <button class="${btnClass}" onclick="addToCart('${p.id}')">${inCart?'הסר':'הוסף'}</button>
-      <button class="qty-btn plus" onclick="changeQty('${p.id}',1)">+</button>
-    </div>`;
+  el.outerHTML = buildRowHTML(p);
 }
 
 function updateFinishCount() {
   document.getElementById('finish-count').textContent = Object.keys(cartItems).length;
 }
 
-// ===== RENDER ADMIN =====
+// ADMIN RENDER
 function renderAdmin() {
   const cats = [...new Set(products.map(p => p.category))].sort();
   const dl = document.getElementById('cat-list');
@@ -590,8 +549,8 @@ function renderAdmin() {
     cp.forEach(p => {
       html += `<div class="admin-product-item">
         <div style="flex:1">
-          <div class="api-name">${esc(p.name)}${p.shabbat?' <span style="font-size:10px;color:#f5a;background:#fff0f5;padding:1px 5px;border-radius:8px">שבת</span>':''}</div>
-          <div class="api-cat">${p.qty}${p.unit?' '+esc(p.unit):''}</div>
+          <div style="font-size:14px;font-weight:500">${esc(p.name)}${p.shabbat?' <span style="font-size:10px;color:#d07;background:#fff0f5;padding:1px 5px;border-radius:8px">שבת</span>':''}</div>
+          <div style="font-size:11px;color:#aaa">${p.qty}${p.unit?' '+esc(p.unit):''}</div>
         </div>
         <div class="api-actions">
           <button class="api-edit" onclick="editProduct('${p.id}')">ערוך</button>
@@ -601,52 +560,49 @@ function renderAdmin() {
     });
   });
   list.innerHTML = html;
-  // restore sheets urls
-  const su = localStorage.getItem('sv3-sheets'); if(su) document.getElementById('sheets-url').value=su;
-  const ssu = localStorage.getItem('sv3-sheets-shabbat'); if(ssu) document.getElementById('sheets-shabbat-url').value=ssu;
+  const su = localStorage.getItem('sv4-sheets'); if(su) document.getElementById('sheets-url').value=su;
+  const ssu = localStorage.getItem('sv4-shabbat'); if(ssu) document.getElementById('sheets-shabbat-url').value=ssu;
 }
 
-// ===== SUMMARY =====
+// SUMMARY
 function showSummary() {
   const items = Object.entries(cartItems);
   if (!items.length) { alert('לא נבחרו פריטים עדיין'); return; }
-  const lines = items.map(([id, item]) => {
-    const p = products.find(x => x.id === id); if (!p) return null;
-    let line = `${p.name} - ${item.qty}`;
+  const lines = [];
+  items.forEach(([id, item]) => {
+    const p = products.find(x => x.id === id); if (!p) return;
+    const total = (item.qtyRegular||0) + (item.qtyShabbat||0);
+    if (total <= 0) return;
+    let line = `${p.name} - ${total}`;
     if (p.unit) line += ` ${p.unit}`;
     if (p.note) line += ` (${p.note})`;
-    return line;
-  }).filter(Boolean);
+    lines.push(line);
+  });
   document.getElementById('modal-content').textContent = lines.join('\n');
   document.getElementById('modal').style.display = 'flex';
 }
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
 function copyAndClose() {
   const text = document.getElementById('modal-content').textContent;
-  const doCopy = () => {
-    try { navigator.clipboard.writeText(text); } catch(e) {
-      const ta = document.createElement('textarea'); ta.value = text;
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    }
-    alert('הרשימה הועתקה! ✓');
-    closeModal();
-    cartItems = {};
-    localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
-    shabbatActive = false;
-    document.getElementById('shabbat-btn').textContent = 'הוסף';
-    document.getElementById('shabbat-btn').className = 'shabbat-toggle off';
-    document.getElementById('shabbat-sub').textContent = 'לחץ להוסיף את כל פריטי השבת';
-    render();
-  };
-  doCopy();
+  try { navigator.clipboard.writeText(text); } catch(e) {
+    const ta = document.createElement('textarea'); ta.value = text;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  alert('הרשימה הועתקה! ✓');
+  closeModal();
+  cartItems = {}; saveCart();
+  shabbatActive = false;
+  document.getElementById('shabbat-btn').textContent = 'הוסף';
+  document.getElementById('shabbat-btn').className = 'shabbat-toggle off';
+  document.getElementById('shabbat-sub').textContent = 'לחץ להוסיף את כל פריטי השבת';
+  render();
 }
 
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ===== INIT =====
+// INIT
 loadSaved();
 render();
-
 </script>
 </body>
 </html>
