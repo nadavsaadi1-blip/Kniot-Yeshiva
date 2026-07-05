@@ -452,7 +452,6 @@ function render() { renderProducts(); updateFinishCount(); }
 function renderProducts() {
   const area = document.getElementById('products-area');
   const nonShabbat = products.filter(p => !p.shabbat);
-  // also show standalone shabbat products (those with no regular match) when shabbatActive
   const standaloneShabbat = shabbatActive
     ? products.filter(p => p.shabbat && !findRegularMatch(p))
     : [];
@@ -462,13 +461,16 @@ function renderProducts() {
     return;
   }
 
-  // collect all categories
-  const allProds = [...nonShabbat, ...standaloneShabbat];
-  const cats = [...new Set(allProds.map(p => p.category))].sort();
+  // preserve order from sheets — categories appear in first-seen order
+  const seenCats = [];
+  [...nonShabbat, ...standaloneShabbat].forEach(p => {
+    if (!seenCats.includes(p.category)) seenCats.push(p.category);
+  });
+
   let html = '';
-  cats.forEach(cat => {
+  seenCats.forEach(cat => {
     const ci = getCatCI(cat);
-    const catProds = allProds.filter(p => p.category === cat);
+    const catProds = [...nonShabbat, ...standaloneShabbat].filter(p => p.category === cat);
     html += `<div class="category-block"><span class="cat-label" style="background:var(--c${ci});color:var(--cb${ci})">${esc(cat)}</span>`;
     catProds.forEach(p => { html += buildRowHTML(p); });
     html += '</div>';
@@ -549,14 +551,15 @@ function updateFinishCount() {
 
 // ADMIN RENDER
 function renderAdmin() {
-  const cats = [...new Set(products.map(p => p.category))].sort();
   const dl = document.getElementById('cat-list');
-  if (dl) dl.innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  if (dl) dl.innerHTML = [...new Set(products.map(p => p.category))].map(c => `<option value="${esc(c)}">`).join('');
   document.getElementById('admin-count').textContent = `רשימת מוצרים (${products.length})`;
   const list = document.getElementById('admin-product-list');
   if (!products.length) { list.innerHTML = '<div class="empty-state">אין מוצרים</div>'; return; }
+  const seenCatsAdmin = [];
+  products.forEach(p => { if (!seenCatsAdmin.includes(p.category)) seenCatsAdmin.push(p.category); });
   let html = '';
-  cats.forEach(cat => {
+  seenCatsAdmin.forEach(cat => {
     const cp = products.filter(p => p.category === cat);
     html += `<div style="font-size:11px;color:#bbb;padding:8px 16px 2px;background:#fafafa;border-bottom:1px solid #f0f0f0">${esc(cat)}</div>`;
     cp.forEach(p => {
