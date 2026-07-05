@@ -347,19 +347,32 @@ function getInputQty(id) {
 
 function addToCart(id) {
   const p = products.find(x => x.id === id); if (!p) return;
-  if (cartItems[id] && (cartItems[id].qtyRegular > 0 || cartItems[id].qtyShabbat > 0)) {
-    // remove regular part only
+  const isAdded = cartItems[id] && (cartItems[id].qtyRegular > 0 || cartItems[id].qtyShabbat > 0);
+  if (isAdded) {
+    // remove regular part only (button now acts as "remove")
     if (cartItems[id].qtyShabbat > 0) {
       cartItems[id].qtyRegular = 0;
     } else {
       delete cartItems[id];
     }
   } else {
+    // read current input value at click time (not just default)
     const qty = getInputQty(id) || p.qty;
     if (!cartItems[id]) cartItems[id] = { qtyRegular: 0, qtyShabbat: 0 };
     cartItems[id].qtyRegular = qty;
   }
   saveCart(); renderProductRow(id); updateFinishCount();
+}
+
+// Allow editing quantity directly while item is already added (regular part)
+function updateRegularQtyFromInput(id) {
+  const p = products.find(x => x.id === id); if (!p) return;
+  const item = cartItems[id];
+  if (!item || item.qtyRegular <= 0) return; // only applies if regular part exists
+  const val = getInputQty(id);
+  if (val === null) return;
+  item.qtyRegular = val;
+  saveCart(); updateFinishCount();
 }
 
 function removeShabbatPart(id) {
@@ -478,7 +491,7 @@ function buildRowHTML(p) {
   // input field
   const inputVal = isAdded ? totalQty : p.qty;
   const unitStr = p.unit ? ' '+esc(p.unit) : '';
-  const inputHtml = `<input class="qty-input" id="input-${p.id}" type="number" value="${inputVal}" min="0" />`;
+  const inputHtml = `<input class="qty-input" id="input-${p.id}" type="number" value="${inputVal}" min="0" oninput="updateRegularQtyFromInput('${p.id}')" />`;
 
   const btnClass = isAdded ? 'add-btn remove' : 'add-btn add';
   const btnText = isAdded ? 'הסר' : 'הוסף';
